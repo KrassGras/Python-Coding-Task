@@ -1,8 +1,10 @@
+import csv
 import io
 from http.client import HTTPException
 import requests
 from fastapi import FastAPI, File, UploadFile
 from fastapi.openapi.utils import status_code_ranges
+from pprint import pprint
 
 app = FastAPI()
 
@@ -53,8 +55,23 @@ def get_vehicle_data(token: str) -> dict:
 
 
 @app.post("/upload.csv/")
-async def upload_csv(file: UploadFile = File(...)):
-    pass
+async def upload_csv(file: UploadFile = File(...)) -> list:
+    """
+    Receives a CSV-file, read the content and returns the data as a list of dicitonaries
+    arguments: file: the uploaded CSV-file
+    returns: csv_data (list of dictionaries where each dictionary represents a row of the csv file)
+    """
+    content = await file.read()
+    decoded_content = content.decode("utf-8")
+    csv_file = io.StringIO(decoded_content)
+    reader = csv.DictReader(csv_file, delimiter=";")
+    csv_data = list(reader)
+    return csv_data
+
+
+
+
+
 
 
 
