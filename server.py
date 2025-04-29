@@ -59,7 +59,7 @@ async def upload_csv(file: UploadFile = File(...)) -> list:
     """
     Receives a CSV-file, read the content and returns the data as a list of dicitonaries
     arguments: file: the uploaded CSV-file
-    returns: csv_data (list of dictionaries where each dictionary represents a row of the csv file)
+    returns: csv_data as a list of dictionaries where each dictionary represents a row of the csv file
     """
     content = await file.read()
     decoded_content = content.decode("utf-8")
