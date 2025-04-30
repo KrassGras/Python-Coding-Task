@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 from http.client import HTTPException, responses
 import requests
 from fastapi import FastAPI, File, UploadFile
@@ -36,7 +37,7 @@ def get_acces_token() -> str:
     else:
         raise HTTPException("Autentification Failed")
 
-def get_vehicle_data(token: str) -> list:
+def get_vehicle_data(token: str) -> list[dict]:
     """
     Expects a token to request the vehicle data
     returns: the vehicle data content as a list of dicitonaries
@@ -54,11 +55,14 @@ def get_vehicle_data(token: str) -> list:
         raise HTTPException(f"Failed to fetch vehicle data {response.text}")
 
 
-def get_label_data(token, csv_data) -> list:
-    """Enriches each row of the given csv data with the color of the first assigned label.
+def get_label_data(token, csv_data) -> list[dict]:
+    """
+    Enriches each row of the given csv data with the color of the first assigned label.
     args: token (str)
           csv_data (list[dict])
-    returns: enriched csv_data with the added ColorCode (list[dict])"""
+    returns: enriched csv_data with the added ColorCode (list[dict])
+    """
+
     headers = {
         "Authorization": f"Bearer {token}"
     }
@@ -78,7 +82,7 @@ def get_label_data(token, csv_data) -> list:
     return csv_data
 
 @app.post("/upload.csv/")
-async def upload_csv(file: UploadFile = File(...)) -> list:
+async def upload_csv(file: UploadFile = File(...)) -> list[dict]:
     """
     Receives a CSV-file, read the content and returns the data as a list of dicitonaries
     arguments: file: the uploaded CSV-file
@@ -92,13 +96,17 @@ async def upload_csv(file: UploadFile = File(...)) -> list:
     csv_data = enrich_with_vehicle_data(csv_data, get_vehicle_data(get_acces_token()))
     filtered_data = [d for d in csv_data if d.get("hu") is not None]
 
+
     return filtered_data
 
-def enrich_with_vehicle_data(csv_data: list, api_data: list) -> list:
-    """Expects csv_data and api_data both as a list of dicitonaries, merges them together based on
+def enrich_with_vehicle_data(csv_data: list, api_data: list) -> list[dict]:
+    """
+    Expects csv_data and api_data both as a list of dicitonaries, merges them together based on
     the column kurzname and then returns it as a list of dicitonaries
     arguments: csv_data, api_data (list of dictionaries)
-    returns: csv_data (list of dictionaries) as the merged product"""
+    returns: csv_data (list of dictionaries) as the merged product
+    """
+
     api_lookup = {item["kurzname"] : item for item in api_data}
 
     for row in csv_data:
