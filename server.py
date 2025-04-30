@@ -54,7 +54,11 @@ def get_vehicle_data(token: str) -> list:
         raise HTTPException(f"Failed to fetch vehicle data {response.text}")
 
 
-def get_label_data(token, csv_data):
+def get_label_data(token, csv_data) -> list:
+    """Enriches each row of the given csv data with the color of the first assigned label.
+    args: token (str)
+          csv_data (list[dict])
+    returns: enriched csv_data with the added ColorCode (list[dict])"""
     headers = {
         "Authorization": f"Bearer {token}"
     }
