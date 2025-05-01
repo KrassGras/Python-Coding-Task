@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import openpyxl
 from dateutil import relativedelta
 from openpyxl.workbook import Workbook
-from openpyxl.styles import PatternFill
+from openpyxl.styles import PatternFill, Font
 
 
 def parse_args():
@@ -33,6 +33,9 @@ def calculate_hu_age(hu: str) -> int:
    hu_datelist =  hu.split("-")
    hu_date = datetime(int(hu_datelist[0]), int(hu_datelist[1]), int(hu_datelist[2]))
    today = datetime.now()
+   delta = relativedelta.relativedelta(today, hu_date)
+
+   return delta.years * 12 + delta.months
 
 
 
@@ -41,18 +44,41 @@ def create_excel(additional_columns: list, tinted: bool, csv_data: list[dict]):
     ws = wb.active
     ws.title = "vehicles"
     column_names = ["rnr"]
+    row_count = 0
+    color_list = list()
+
     if additional_columns:
         column_names.extend(additional_columns)
     ws.append(column_names)
 
-   # if tinted:
-    #    red = PatternFill(start_color="#b30000", fill_type="solid")
-     #   orange = PatternFill(start_color="#FFA500", fill_type="solid")
-      #  green = PatternFill(start_color="#007500", fill_type="solid")
+    red_fill = PatternFill(start_color="FFb30000", fill_type="solid")
+    orange_fill = PatternFill(start_color="FFFFA500", fill_type="solid")
+    green_fill = PatternFill(start_color="FF007500", fill_type="solid")
 
-    for row in csv_data:
+    for idx, row in enumerate(csv_data, start=2):
         row_data = [row.get("rnr")] + [row.get(col) for col in additional_columns]
         ws.append(row_data)
+
+
+        if tinted and "hu" in row:
+            age_in_months = calculate_hu_age(row["hu"])
+            if age_in_months <= 3:
+                fill = green_fill
+            elif age_in_months <= 12:
+                fill = orange_fill
+            else:
+                fill = red_fill
+            for col in range(1, len(row_data) + 1):
+                ws.cell(row=idx, column=col).fill = fill
+
+        if "labelIds" in column_names and "colorCode" in row and row["colorCode"]:
+            colorcode = row["colorcode"].strip("#")
+            color = Font(color=colorcode)
+            try:
+                col_index = column_names.index("labelIds") +1
+                ws.cell(row=idx, col=col_index).font = color
+            except:
+                pass
 
     wb.save(f"vehicles_{datetime.now().date().isoformat()}.xlsx")
 
@@ -62,14 +88,11 @@ if __name__ == "__main__":
 
     print("CSV-Datei wird verarbeitet...")
     response = send_csv_to_server(args.csv_file)
-    #dingen = json.dumps(response)
-
 
     df = pd.DataFrame(response)
     df = df.sort_values(by="gruppe")
     sorted_data = json.loads(df.to_json(orient="records", indent=2))
     test = json.dumps(sorted_data)
-
 
     create_excel(list(args.keys), args.colored, sorted_data)
     print(args.keys, args.colored)
