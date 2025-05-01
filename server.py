@@ -26,7 +26,7 @@ AUTH_headers = {
 def get_acces_token() -> str:
     """
     Sends a request to get the token
-    returns: accessstoken (str)
+    returns: accesstoken (str)
     """
     response = requests.post(AUTH_URL, json=AUTH_payload, headers=AUTH_headers)
 
@@ -38,7 +38,7 @@ def get_acces_token() -> str:
 def get_vehicle_data(token: str) -> list[dict]:
     """
     Expects a token to request the vehicle data
-    returns: the vehicle data content as a list of dicitonaries
+    returns: the vehicle data content as a list of dictonaries
     """
 
     headers = {
@@ -82,7 +82,7 @@ def get_label_data(token, csv_data) -> list[dict]:
 @app.post("/upload.csv/")
 async def upload_csv(file: UploadFile = File(...)) -> list[dict]:
     """
-    Receives a CSV-file, read the content and returns the data as a list of dicitonaries
+    Receives a CSV-file, read the content and returns the data as a list of dictonaries
     arguments: file: the uploaded CSV-file
     returns: filtered_data as a list of dictionaries where each dictionary represents a row of the csv file
     """
@@ -99,8 +99,8 @@ async def upload_csv(file: UploadFile = File(...)) -> list[dict]:
 
 def enrich_with_vehicle_data(csv_data: list, api_data: list) -> list[dict]:
     """
-    Expects csv_data and api_data both as a list of dicitonaries, merges them together based on
-    the column kurzname and then returns it as a list of dicitonaries
+    Expects csv_data and api_data both as a list of dictonaries, merges them together based on
+    the column kurzname and then returns it as a list of dictonaries
     arguments: csv_data, api_data (list of dictionaries)
     returns: csv_data (list of dictionaries) as the merged product
     """
