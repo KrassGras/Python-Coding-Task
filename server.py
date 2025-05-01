@@ -5,8 +5,6 @@ from http.client import HTTPException, responses
 import requests
 from fastapi import FastAPI, File, UploadFile
 from fastapi.openapi.utils import status_code_ranges
-
-
 app = FastAPI()
 
 #URLs for the external API for the vehicle data
