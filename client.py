@@ -27,7 +27,7 @@ def send_csv_to_server(path: str) -> list[dict]:
     returns: list of dictionaries
     """
     url = "http://localhost:8000/upload.csv/"
-    with open(args.csv_file, "rb") as f:
+    with open(path, "rb") as f:
         files = {"file": (path, f, "text/csv")}
         response = requests.post(url, files=files)
 
@@ -85,11 +85,11 @@ def create_excel(additional_columns: list, tinted: bool, csv_data: list[dict]):
                 ws.cell(row=idx, column=col).fill = fill
 
         if "labelIds" in column_names and "colorCode" in row and row["colorCode"]:
-            colorcode = row["colorcode"].strip("#")
+            colorcode = row["colorCode"].strip("#")
             color = Font(color=colorcode)
             try:
                 col_index = column_names.index("labelIds") +1
-                ws.cell(row=idx, col=col_index).font = color
+                ws.cell(row=idx, column=col_index).font = color
             except:
                 pass
 
