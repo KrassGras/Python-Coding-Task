@@ -53,7 +53,7 @@ def get_vehicle_data(token: str) -> list[dict]:
         raise HTTPException(f"Failed to fetch vehicle data {response.text}")
 
 
-def get_label_data(token, csv_data) -> list[dict]:
+def get_label_data(token: str, csv_data) -> list[dict]:
     """
     Enriches each row of the given csv data with the color of the first assigned label.
     args: token (str)
