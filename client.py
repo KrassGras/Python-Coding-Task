@@ -105,6 +105,6 @@ if __name__ == "__main__":
     df = pd.DataFrame(response)
     df = df.sort_values(by="gruppe")
     sorted_data = json.loads(df.to_json(orient="records", indent=2))
-    test = json.dumps(sorted_data)
+    
 
     create_excel(list(args.keys), args.colored, sorted_data)
